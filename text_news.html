@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text News Check</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+        }
+        .box {
+            width: 60%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #b30000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        h2 { text-align: center; }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>News Text Verification</h2>
+
+    <!-- FORM -->
+    <form method="POST">
+        <textarea name="news" placeholder="Paste news text here..." required></textarea>
+        <center>
+            <button type="submit">Check News</button>
+        </center>
+    </form>
+
+    <!-- RESULT -->
+    {% if result %}
+        <h3 style="text-align:center; margin-top:20px;">
+            {% if result == "REAL" %}
+                ✅ REAL NEWS ({{ confidence }}%)
+            {% else %}
+                ❌ FAKE NEWS ({{ confidence }}%)
+            {% endif %}
+        </h3>
+    {% endif %}
+
+    <!-- CHARTS -->
+    {% if result %}
+    <div style="display:flex; justify-content:space-around; margin-top:30px;">
+        <canvas id="pieChart" width="200" height="200"></canvas>
+        <canvas id="donutChart" width="200" height="200"></canvas>
+        <canvas id="barChart" width="220" height="200"></canvas>
+    </div>
+    {% endif %}
+</div>
+
+{% if result %}
+<script>
+    let realPercent = 0;
+    let fakePercent = 0;
+
+    {% if result == "REAL" %}
+        realPercent = {{ confidence }};
+        fakePercent = {{ 100 - confidence }};
+    {% else %}
+        fakePercent = {{ confidence }};
+        realPercent = {{ 100 - confidence }};
+    {% endif %}
+
+    new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+            labels: ["Real", "Fake"],
+            datasets: [{
+                data: [realPercent, fakePercent],
+                backgroundColor: ["#22c55e", "#ef4444"]
+            }]
+        },
+        options: { responsive: false }
+    });
+
+    new Chart(document.getElementById("donutChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Real", "Fake"],
+            datasets: [{
+                data: [realPercent, fakePercent],
+                backgroundColor: ["#16a34a", "#dc2626"]
+            }]
+        },
+        options: {
+            responsive: false,
+            cutout: "65%"
+        }
+    });
+
+    new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+            labels: ["Real", "Fake"],
+            datasets: [{
+                data: [realPercent, fakePercent],
+                backgroundColor: ["#15803d", "#b91c1c"]
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: false,
+            scales: {
+                x: { max: 100 }
+            }
+        }
+    });
+</script>
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image News Verification</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+        }
+        .box {
+            width: 60%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+            text-align: center;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Image News Verification</h2>
+
+    <input type="file" id="imageFile" accept="image/*"><br>
+    <button id="analyzeBtn" onclick="checkImage()">Analyze Image</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function checkImage() {
+    const btn = document.getElementById("analyzeBtn");
+    const fileInput = document.getElementById("imageFile");
+
+    if (fileInput.files.length === 0) {
+        alert("Please upload an image");
+        return;
+    }
+
+    // disable button while processing
+    btn.disabled = true;
+    btn.innerText = "Analyzing...";
+
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    fetch("/image-predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerHTML = `
+            <p>${data.prediction === "REAL" ? "✅ REAL IMAGE" : "❌ FAKE IMAGE"}</p>
+            <p>Confidence: ${data.confidence}%</p>
+            <p>Real: ${data.real_percent}%</p>
+            <p>Fake: ${data.fake_percent}%</p>
+        `;
+    })
+    .catch(err => {
+        alert("Server error. Try again.");
+        console.error(err);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerText = "Analyze Image";
+    });
+}
+</script>
+
+</body>
+</html>
