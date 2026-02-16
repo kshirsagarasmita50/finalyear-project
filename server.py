@@ -5,8 +5,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# ---------------- LOGIN PAGE ----------------
-@app.route("/")
+# ---------------- LOGIN PAGE ------
 def login_page():
     return render_template("login.html")
 
