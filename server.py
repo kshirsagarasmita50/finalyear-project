@@ -1,4 +1,5 @@
 # changes made on the 17th feb 2026
+
 from flask import Flask, render_template, request, redirect, url_for
 from flask_cors import CORS
 
@@ -8,6 +9,7 @@ CORS(app)
 # ---------------- LOGIN PAGE ------
 def login_page():
     return render_template("login.html")
+#hello
 
 # ---------------- LOGIN CHECK ----------------
 @app.route("/login", methods=["POST"])
